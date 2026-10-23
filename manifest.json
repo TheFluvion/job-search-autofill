@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "CV Autofill",
+  "version": "0.1.0",
+  "description": "Llena formularios de postulación laboral a partir de tu CV usando IA (Claude o Gemini).",
+  "permissions": ["activeTab", "scripting", "sidePanel", "storage"],
+  "host_permissions": [
+    "<all_urls>",
+    "https://api.anthropic.com/*",
+    "https://generativelanguage.googleapis.com/*"
+  ],
+  "background": { "service_worker": "background.js" },
+  "action": { "default_title": "Abrir CV Autofill" },
+  "side_panel": { "default_path": "panel.html" },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

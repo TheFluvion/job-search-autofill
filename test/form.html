@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8" /><title>Form de prueba CV Autofill</title>
+<style>body{font:14px system-ui;max-width:640px;margin:24px auto}label{display:block;margin-top:8px}.block{border:1px solid #ccc;padding:8px;margin:8px 0}</style>
+</head>
+<body>
+  <h2>Datos personales</h2>
+  <label>Nombre <input name="first_name" /></label>
+  <label>Apellido <input name="last_name" /></label>
+  <label for="email">Email</label><input id="email" type="email" />
+  <input placeholder="Teléfono" type="tel" />
+  <label>País
+    <select name="country"><option value="">Seleccionar</option><option>Argentina</option><option>Uruguay</option><option>Chile</option></select>
+  </label>
+  <fieldset><legend>¿Disponibilidad para viajar?</legend>
+    <label><input type="radio" name="travel" value="y" /> Sí</label>
+    <label><input type="radio" name="travel" value="n" /> No</label>
+  </fieldset>
+  <label>LinkedIn <input name="linkedin" type="url" /></label>
+  <label>CV <input type="file" /></label>
+
+  <h2>Experiencia laboral</h2>
+  <div id="exp">
+    <div class="block">
+      <label>Empresa <input name="company[]" /></label>
+      <label>Puesto <input name="title[]" /></label>
+      <label>Desde <input type="month" name="from[]" /></label>
+      <label>Hasta <input type="month" name="to[]" /></label>
+      <label><input type="checkbox" name="current[]" /> Trabajo actualmente aquí</label>
+      <label>Descripción <textarea name="desc[]"></textarea></label>
+    </div>
+  </div>
+  <button type="button" id="addExp">+ Agregar experiencia</button>
+
+  <h2>Educación</h2>
+  <div class="block">
+    <label>Universidad <input name="school" /></label>
+    <label>Título <input name="degree" /></label>
+    <label>Fecha de egreso <input type="date" name="grad" /></label>
+  </div>
+
+  <h2>Otros</h2>
+  <label>¿Por qué querés trabajar con nosotros? <textarea name="why"></textarea></label>
+  <label><input type="checkbox" name="terms" /> Acepto los términos</label>
+
+  <script>
+    document.getElementById('addExp').addEventListener('click', () => {
+      const first = document.querySelector('#exp .block');
+      const clone = first.cloneNode(true);
+      clone.querySelectorAll('[data-cvfill-id]').forEach((el) => el.removeAttribute('data-cvfill-id'));
+      clone.querySelectorAll('input, textarea').forEach((el) => { el.value = ''; el.checked = false; el.style.outline = ''; });
+      document.getElementById('exp').append(clone);
+    });
+  </script>
+</body>
+</html>
