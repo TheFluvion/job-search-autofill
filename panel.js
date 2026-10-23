@@ -341,6 +341,27 @@ async function loadReport() {
   renderReport(cvfill_last_report);
 }
 
+// ---------- Help modal ----------
+
+function openHelp() {
+  const modal = $('helpModal');
+  modal.hidden = false;
+  modal.classList.add('open');
+}
+
+function closeHelp() {
+  const modal = $('helpModal');
+  modal.classList.remove('open');
+  modal.hidden = true;
+}
+
+$('helpBtn').addEventListener('click', openHelp);
+$('helpClose').addEventListener('click', closeHelp);
+$('helpModal').addEventListener('click', (e) => { if (e.target === $('helpModal')) closeHelp(); });
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && $('helpModal').classList.contains('open')) closeHelp();
+});
+
 loadSettings();
 loadProfile();
 loadReport();

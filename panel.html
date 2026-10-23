@@ -6,8 +6,10 @@
   <style>
     * { box-sizing: border-box; }
     body { font: 13px/1.4 system-ui, -apple-system, sans-serif; margin: 0; padding: 12px; color: #1f2328; background: #f6f8fa; }
-    h1 { font-size: 16px; margin: 0 0 12px; }
+    h1 { font-size: 16px; margin: 0; }
     h2 { font-size: 13px; margin: 0 0 8px; text-transform: uppercase; letter-spacing: .04em; color: #57606a; }
+    .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 8px; }
+    .help-btn { width: 28px; height: 28px; padding: 0; border-radius: 50%; font-weight: 700; line-height: 1; }
     section { background: #fff; border: 1px solid #d0d7de; border-radius: 8px; padding: 10px; margin-bottom: 12px; }
     label { display: block; font-size: 12px; color: #57606a; margin: 6px 0 2px; }
     input, select, textarea { width: 100%; padding: 6px; border: 1px solid #d0d7de; border-radius: 6px; font: inherit; }
@@ -28,18 +30,94 @@
     ul.report .lbl { font-weight: 600; }
     ul.report .meta { font-size: 11px; color: #57606a; word-break: break-word; }
     .counts { font-size: 12px; margin-top: 4px; }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(27, 31, 36, .45); display: none; align-items: center; justify-content: center; padding: 12px; z-index: 100; }
+    .modal-backdrop.open { display: flex; }
+    .modal { background: #fff; border: 1px solid #d0d7de; border-radius: 10px; width: 100%; max-height: calc(100vh - 24px); overflow: auto; padding: 14px; box-shadow: 0 8px 24px rgba(0,0,0,.18); }
+    .modal-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; }
+    .modal-head h2 { margin: 0; text-transform: none; letter-spacing: 0; color: #1f2328; font-size: 15px; }
+    .modal-close { width: 28px; height: 28px; padding: 0; }
+    .guide h3 { font-size: 13px; margin: 14px 0 6px; }
+    .guide ol, .guide ul { margin: 0 0 8px; padding-left: 18px; }
+    .guide li { margin-bottom: 4px; }
+    .guide p { margin: 0 0 8px; }
+    .guide .note { background: #fff8c5; border: 1px solid #d4a72c; border-radius: 6px; padding: 8px; }
+    .guide a.key-link { color: #000080; text-decoration: underline; }
   </style>
 </head>
 <body>
-  <h1>CV Autofill</h1>
+  <div class="top">
+    <h1>CV Autofill</h1>
+    <button id="helpBtn" class="help-btn" type="button" aria-label="Cómo usar" title="Cómo usar">?</button>
+  </div>
+
+  <div id="helpModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="helpTitle" hidden>
+    <div class="modal">
+      <div class="modal-head">
+        <h2 id="helpTitle">Cómo usar</h2>
+        <button id="helpClose" class="modal-close" type="button" aria-label="Cerrar">×</button>
+      </div>
+      <div class="guide">
+        <h3>1. Configurar la IA</h3>
+        <ol>
+          <li>Abrí <strong>Configuración IA</strong>.</li>
+          <li>Elegí proveedor (Gemini, Claude o ChatGPT) y pegá tu API key.</li>
+        </ol>
+        <p><strong>Si no sabés cómo obtener la API key de <a class="key-link" href="https://www.google.com/search?q=Como+obtener+apikey+de+Gemini" target="_blank" rel="noopener noreferrer">Gemini</a>, <a class="key-link" href="https://www.google.com/search?q=Como+obtener+apikey+de+Claude" target="_blank" rel="noopener noreferrer">Claude</a> o <a class="key-link" href="https://www.google.com/search?q=Como+obtener+apikey+de+OpenAI+ChatGPT" target="_blank" rel="noopener noreferrer">ChatGPT</a>, hacé click en los nombres.</strong></p>
+        <ol start="3">
+          <li>Revisá el modelo (por defecto la versión gratis/barata de cada uno) y tocá <strong>Guardar</strong>.</li>
+        </ol>
+        <p>Listado de modelos disponibles: <a class="key-link" href="https://ai.google.dev/gemini-api/docs/models" target="_blank" rel="noopener noreferrer">Gemini</a>, <a class="key-link" href="https://docs.anthropic.com/en/docs/about-claude/models" target="_blank" rel="noopener noreferrer">Claude</a>, <a class="key-link" href="https://platform.openai.com/docs/models" target="_blank" rel="noopener noreferrer">ChatGPT (OpenAI)</a>.</p>
+
+        <h3>2. Cargar el CV</h3>
+        <ol>
+          <li>Elegí un PDF del CV y tocá <strong>Parsear CV</strong>.</li>
+          <li>Revisá el JSON del perfil, editá si hace falta y tocá <strong>Guardar perfil</strong>.</li>
+        </ol>
+        <p>También se leen hipervínculos del PDF (LinkedIn, GitHub), aunque estén detrás de íconos.</p>
+
+        <h3>3. Llenar el formulario</h3>
+        <ol>
+          <li>Abrí la página del formulario de postulación.</li>
+          <li>Tocá <strong>Llenar</strong>. Escanea campos, agrega bloques si hace falta y mapea por pasos.</li>
+          <li>Si la IA está saturada, reintenta sola y muestra el progreso.</li>
+        </ol>
+
+        <h3>4. Revisar el reporte</h3>
+        <ul>
+          <li><strong>Verde</strong>: llenado OK.</li>
+          <li><strong>Amarillo</strong>: baja confianza (revisalo).</li>
+          <li><strong>Rojo</strong>: no se pudo llenar.</li>
+        </ul>
+        <p>Click en un ítem para ir al campo. En formularios multi-paso, tocá <strong>Llenar</strong> en cada pantalla.</p>
+
+        <h3>Limitaciones</h3>
+        <ul>
+          <li>Captchas, algunos iframes y subida de archivos.</li>
+          <li>Campos personales (salario, motivación, DEI) quedan sin llenar a propósito.</li>
+        </ul>
+
+        <h3>Template de CV</h3>
+        <p>En el repo está <code>cv_template_spanish.html</code> para adaptar.</p>
+        <ol>
+          <li>Editá el HTML con tus datos.</li>
+          <li>Abrilo en el navegador.</li>
+          <li>Usá <strong>Ctrl+P</strong> (Cmd+P en Mac).</li>
+          <li>Elegí <strong>Guardar como PDF</strong> (no “Print to PDF” del sistema: suele romper links).</li>
+          <li>Usá ese PDF en la extensión.</li>
+        </ol>
+        <p class="note">Usá siempre <strong>Guardar como PDF</strong> del navegador para no perder LinkedIn/GitHub.</p>
+      </div>
+    </div>
+  </div>
 
   <section>
     <details id="settingsBox">
       <summary>Configuración IA</summary>
       <label for="provider">Proveedor</label>
       <select id="provider">
-        <option value="claude">Claude</option>
         <option value="gemini">Gemini</option>
+        <option value="claude">Claude</option>
+        <option value="openai">ChatGPT (OpenAI)</option>
       </select>
       <label for="apiKey">API key</label>
       <input id="apiKey" type="password" autocomplete="off" />
