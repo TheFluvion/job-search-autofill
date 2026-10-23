@@ -341,6 +341,26 @@ async function loadReport() {
   renderReport(cvfill_last_report);
 }
 
+// ---------- Theme ----------
+
+function applyTheme(theme) {
+  const t = theme === 'light' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', t);
+  $('themeBtn').textContent = t === 'dark' ? '☀' : '☾';
+  $('themeBtn').title = t === 'dark' ? 'Modo claro' : 'Modo oscuro';
+}
+
+async function loadTheme() {
+  const { cvfill_theme } = await chrome.storage.local.get('cvfill_theme');
+  applyTheme(cvfill_theme || 'dark');
+}
+
+$('themeBtn').addEventListener('click', async () => {
+  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  await chrome.storage.local.set({ cvfill_theme: next });
+});
+
 // ---------- Help modal ----------
 
 function openHelp() {
@@ -362,6 +382,7 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && $('helpModal').classList.contains('open')) closeHelp();
 });
 
+loadTheme();
 loadSettings();
 loadProfile();
 loadReport();
